@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Арт Студио - Процес</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="/">Начало</a></li>
+                
+                <li class="dropdown">
+                    <a href="#">Плакати ▼</a>
+                    <ul class="submenu">
+                        <li><a href="/index.html" onclick="localStorage.setItem('filter', 'Plakati-8')">8 клас</a></li>
+                        <li><a href="/index.html" onclick="localStorage.setItem('filter', 'Plakati-9')">9 клас</a></li>
+                        <li><a href="/index.html" onclick="localStorage.setItem('filter', 'Plakati-10')">10 клас</a></li>
+                        <li><a href="/index.html" onclick="localStorage.setItem('filter', 'Plakati-11')">11 клас</a></li>
+                        <li><a href="/index.html" onclick="localStorage.setItem('filter', 'Plakati-12')">12 клас</a></li>
+                    </ul>
+                </li>
+                
+                <li class="dropdown">
+                    <a href="#">Графика ▼</a>
+                    <ul class="submenu">
+                        <li><a href="/index.html" onclick="localStorage.setItem('filter', 'Grafika-8')">8 клас</a></li>
+                        <li><a href="/index.html" onclick="localStorage.setItem('filter', 'Grafika-9')">9 клас</a></li>
+                        <li><a href="/index.html" onclick="localStorage.setItem('filter', 'Grafika-10')">10 клас</a></li>
+                        <li><a href="/index.html" onclick="localStorage.setItem('filter', 'Grafika-11')">11 клас</a></li>
+                        <li><a href="/index.html" onclick="localStorage.setItem('filter', 'Grafika-12')">12 клас</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="/index.html">Проекти</a></li>
+                <li><a href="studio.html">Арт Студио</a></li>
+                <li><a href="about.html">За нас</a></li>
+                
+                <li><a href="#" onclick="logout()" style="color: #ff4d4d; margin-left: 20px;">Изход</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1 style="text-align: center;">Творческият процес</h1>
+        <div class="gallery-container">
+            <div class="artwork-card">
+                <img src="images/studio1.jpg" alt="Процес 1">
+                <div style="padding: 15px; text-align: center; background: white;">Скициране на начални идеи</div>
+            </div>
+            <div class="artwork-card">
+                <img src="images/studio2.jpg" alt="Процес 2">
+                <div style="padding: 15px; text-align: center; background: white;">Подготовка на материалите</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Проверка дали е логнат
+        if (!localStorage.getItem('galleryUser')) {
+            window.location.href = 'login.html';
+        }
+
+        // Функция за изход
+        function logout() {
+            localStorage.removeItem('galleryUser');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

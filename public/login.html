@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход - Арт Галерия</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="background: #f4f4f4; display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px;">
+        <h2 style="text-align: center;">Вход в Галерията на СУ Бачо Киро</h2>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Имейл" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;">
+            <input type="password" id="password" placeholder="Парола" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;">
+            <button type="submit" style="width: 100%; padding: 10px; background: #1407a9; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">ВЛЕЗ</button>
+        </form>
+        <p style="text-align: center; margin-top: 15px;">Нямате профил? <a href="register.html">Регистрирайте се</a></p>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                // ЗАПИСВАМЕ ИМЕТО И ИМЕЙЛА
+                localStorage.setItem('galleryUser', data.username);
+                localStorage.setItem('userEmail', email); 
+                window.location.href = 'index.html';
+            } else {
+                alert(data.message);
+            }
+        };
+    </script>
+</body>
+</html>

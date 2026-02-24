@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация - Арт Галерия</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="display:flex; justify-content:center; align-items:center; height:100vh; background:#f0f2f5;">
+    <div style="background:white; padding:40px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.1); width:100%; max-width:400px;">
+        <h2 style="text-align:center;">Регистрация</h2>
+        <form id="registerForm">
+            <input type="text" id="regName" placeholder="Вашето име (Псевдоним)" required style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
+            <input type="email" id="regEmail" placeholder="Имейл адрес" required style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
+            <input type="password" id="regPassword" placeholder="Парола" required style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
+            <button type="submit" style="width:100%; padding:12px; background:#28a745; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; margin-top:10px;">СЪЗДАЙ ПРОФИЛ</button>
+        </form>
+        <p style="text-align:center; margin-top:15px;"><a href="login.html">Вече имате профил? Влезте тук</a></p>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    username: document.getElementById('regName').value,
+                    email: document.getElementById('regEmail').value,
+                    password: document.getElementById('regPassword').value
+                })
+            });
+            const data = await res.json();
+            alert(data.message);
+            if (res.ok) window.location.href = 'login.html';
+        };
+    </script>
+</body>
+</html>

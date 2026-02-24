@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Администрация - Добави творба</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="background-color: #2c3e50;"> <div id="admin-panel" style="display: none; max-width: 500px; margin: 50px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <h2 style="text-align: center; color: #333;">Качване на нова творба</h2>
+        <hr>
+        <br>
+        <form id="uploadForm">
+            <label>Име на ученика:</label>
+            <input type="text" id="studentName" placeholder="Пример: Иван Иванов" required style="width:100%; padding:12px; margin: 10px 0 20px 0; border:1px solid #ddd; border-radius:5px;">
+            
+            <label>Линк към снимката:</label>
+            <input type="text" id="imageUrl" placeholder="images/kartina1.jpg" required style="width:100%; padding:12px; margin: 10px 0 20px 0; border:1px solid #ddd; border-radius:5px;">
+            
+            <label>Категория:</label>
+            <select id="category" style="width:100%; padding:12px; margin: 10px 0 20px 0; border:1px solid #ddd; border-radius:5px;">
+                <option value="Плакати">Плакати</option>
+                <option value="Графика">Графика</option>
+                <option value="Дипломна работа">Дипломна работа</option>
+            </select>
+
+            <label>Клас (8-12):</label>
+            <input type="number" id="grade" min="8" max="12" value="8" required style="width:100%; padding:12px; margin: 10px 0 20px 0; border:1px solid #ddd; border-radius:5px;">
+            
+            <button type="submit" style="width:100%; padding:15px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 1.1rem;">ПУБЛИКУВАЙ В ГАЛЕРИЯТА</button>
+        </form>
+        <br>
+        <div style="text-align: center;">
+            <a href="/" style="text-decoration: none; color: #666;">← Отказ и връщане към сайта</a>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. ТАЙНАТА ПАРОЛА ---
+        const MY_SECRET_PIN = "2026"; // Смени това с твоя парола!
+
+        // Проверка при зареждане
+        window.onload = function() {
+            const entry = prompt("Въведете администраторски ПИН код:");
+            if (entry === MY_SECRET_PIN) {
+                document.getElementById('admin-panel').style.display = 'block';
+            } else {
+                alert("Достъпът е забранен!");
+                window.location.href = "/"; // Връща го в началото
+            }
+        };
+
+        // --- 2. ИЗПРАЩАНЕ НА ДАННИТЕ ---
+        document.getElementById('uploadForm').onsubmit = async (e) => {
+            e.preventDefault();
+
+            const newArtwork = {
+                studentName: document.getElementById('studentName').value,
+                imageUrl: document.getElementById('imageUrl').value,
+                category: document.getElementById('category').value,
+                grade: parseInt(document.getElementById('grade').value),
+                averageRating: 0 // Задължително започваме от 0
+            };
+
+            const response = await fetch('/api/artworks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newArtwork)
+            });
+
+            if (response.ok) {
+                alert("Творбата е добавена успешно!");
+                window.location.href = "/"; // Пренасочване към галерията
+            } else {
+                alert("Грешка при записването.");
+            }
+        };
+    </script>
+</body>
+</html>

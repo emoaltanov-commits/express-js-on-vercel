@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Арт Галерия</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="/">Начало</a></li> 
+                
+                <li class="dropdown">
+                    <a href="#">Плакати ▼</a>
+                    <ul class="submenu">
+                        <li><a href="#" onclick="filterArt('Плакати', 8)">8 клас</a></li>
+                        <li><a href="#" onclick="filterArt('Плакати', 9)">9 клас</a></li>
+                        <li><a href="#" onclick="filterArt('Плакати', 10)">10 клас</a></li>
+                        <li><a href="#" onclick="filterArt('Плакати', 11)">11 клас</a></li>
+                        <li><a href="#" onclick="filterArt('Плакати', 12)">12 клас</a></li>
+                    </ul>
+                </li>
+                
+                <li class="dropdown">
+                    <a href="#">Графика ▼</a>
+                    <ul class="submenu">
+                        <li><a href="#" onclick="filterArt('Графика', 8)">8 клас</a></li>
+                        <li><a href="#" onclick="filterArt('Графика', 9)">9 клас</a></li>
+                        <li><a href="#" onclick="filterArt('Графика', 10)">10 клас</a></li>
+                        <li><a href="#" onclick="filterArt('Графика', 11)">11 клас</a></li>
+                        <li><a href="#" onclick="filterArt('Графика', 12)">12 клас</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="#" onclick="filterByCategory('Дипломна работа')">Проекти</a></li>
+                <li><a href="studio.html">Арт Студио</a></li>
+                <li><a href="about.html">За нас</a></li>
+                
+                <li><a href="#" onclick="logout()" style="color: #ff4d4d; margin-left: 20px;">Изход</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="top-artworks-section" style="margin: 20px; background: #fffcf0; padding: 20px; border-radius: 15px; display: none;">
+            <h2 style="text-align: center; color: #f1c40f;">🏆 Топ 3 Най-харесвани</h2>
+            <div id="top-gallery" class="gallery-container"></div>
+            <hr style="width: 80%; margin: 40px auto; border: 0.5px solid #eee;">
+        </section>
+
+        <h1 id="gallery-title" style="text-align: center; margin-top: 30px;">Галерия на талантите</h1>
+        <div id="gallery" class="gallery-container"></div>
+    </main>
+
+    <script>
+        // 1. ПРОВЕРКА ЗА ЛОГИН
+        if (!localStorage.getItem('galleryUser')) {
+            window.location.href = 'login.html';
+        }
+
+        // 2. ФУНКЦИЯ ЗА ИЗХОД
+        function logout() {
+            localStorage.removeItem('galleryUser');
+            window.location.href = 'login.html';
+        }
+
+        // 3. СЪЗДАВАНЕ НА КАРТА
+        function createCard(art) {
+            return `
+                <div class="artwork-card">
+                    <img src="${art.imageUrl}" alt="Картина">
+                    <div class="overlay">
+                        <div class="student-name">${art.studentName}</div>
+                        <div class="stars" onclick="vote(${art.id})" style="cursor:pointer">
+                            ⭐ <span id="rating-${art.id}">${art.averageRating || 0}</span>
+                        </div>
+                        <div style="font-size: 0.8rem; margin-top:10px;">${art.category}, ${art.grade} клас</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 4. ГЛАСУВАНЕ
+        function vote(id) {
+    const userEmail = localStorage.getItem('userEmail'); // Взимаме имейла
+    if (!userEmail) {
+        alert("Грешка: Не е намерен имейл. Моля, излезте и влезте отново.");
+        return;
+    }
+
+    const rating = prompt("Оцени от 1 до 5:");
+    if (rating >= 1 && rating <= 5) {
+        fetch('/api/vote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                id: id, 
+                rating: rating, 
+                email: userEmail // ПРАЩАМЕ ИМЕЙЛА КЪМ СЪРВЪРА
+            })
+        }).then(async res => {
+            const data = await res.json();
+            if (res.ok) {
+                alert("Благодарим за гласа!");
+                location.reload();
+            } else {
+                alert(data.message); // Тук ще каже "Вече сте гласували"
+            }
+        });
+    }
+}
+
+        // 5. ФИЛТРИРАНЕ
+        function filterArt(category, grade) {
+            fetch('/api/artworks').then(res => res.json()).then(data => {
+                const gallery = document.getElementById('gallery');
+                gallery.innerHTML = "";
+                const filtered = data.filter(a => a.category === category && a.grade == grade);
+                filtered.length ? filtered.forEach(a => gallery.innerHTML += createCard(a)) 
+                               : gallery.innerHTML = "<p style='text-align:center; width:100%;'>Няма намерени творби.</p>";
+                document.getElementById('top-artworks-section').style.display = 'none';
+                document.getElementById('gallery-title').innerText = `${category} - ${grade} клас`;
+            });
+        }
+
+        function filterByCategory(cat) {
+            fetch('/api/artworks').then(res => res.json()).then(data => {
+                const gallery = document.getElementById('gallery');
+                gallery.innerHTML = "";
+                const filtered = data.filter(a => a.category === cat);
+                if (filtered.length > 0) {
+                    filtered.forEach(a => gallery.innerHTML += createCard(a));
+                } else {
+                    gallery.innerHTML = `<p style='text-align:center; width:100%;'>Все още няма проекти в категория "${cat}".</p>`;
+                }
+                document.getElementById('top-artworks-section').style.display = 'none';
+                document.getElementById('gallery-title').innerText = cat;
+            });
+        }
+
+        // 6. ЗАРЕЖДАНЕ ПРИ СТАРТ
+        fetch('/api/artworks').then(res => res.json()).then(artworks => {
+            const gallery = document.getElementById('gallery');
+            const topGallery = document.getElementById('top-gallery');
+            
+            if (artworks.length > 0) {
+                document.getElementById('top-artworks-section').style.display = 'block';
+                
+                // Топ 3
+                const top3 = [...artworks].sort((a,b) => (b.averageRating || 0) - (a.averageRating || 0)).slice(0,3);
+                top3.forEach(a => topGallery.innerHTML += createCard(a));
+                
+                // Всички
+                artworks.forEach(a => gallery.innerHTML += createCard(a));
+            } else {
+                gallery.innerHTML = "<p style='text-align:center; width:100%;'>Няма качени творби.</p>";
+            }
+        });
+    </script>
+</body>
+</html>

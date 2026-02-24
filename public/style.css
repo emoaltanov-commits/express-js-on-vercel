@@ -1,9 +1,133 @@
+
 body {
-    font-family: system-ui, sans-serif;
-    margin: 2rem;
-    line-height: 1.5;
-  }
-  nav a {
-    margin-right: 1rem;
-  }
-  
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: oklch(48.245% 0.14707 256.96);
+    color: white;
+    padding: 1rem 0;
+}
+
+.nav-menu {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-menu > li {
+    position: relative; 
+    margin: 0 15px;
+}
+
+.nav-menu a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+
+.submenu {
+    display: none;
+    position: absolute;
+    background-color: #062ea6;
+    list-style: none;
+    padding: 10px;
+    top: 100%;
+    left: 0;
+    min-width: 120px;
+}
+
+.submenu li {
+    margin: 5px 0;
+}
+
+
+.dropdown:hover .submenu {
+    display: block;
+}
+
+.nav-menu a:hover {
+    color: #ffcc00; 
+}
+
+.gallery-container {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    flex-wrap: wrap;
+}
+
+
+.artwork-card {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 15px;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.artwork-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    transition: filter 0.3s ease; 
+}
+
+/* Потъмняващият слой (Overlay) */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    opacity: 0; 
+    transition: opacity 0.3s ease;
+}
+
+/* Когато мишката е върху картата: */
+.artwork-card:hover img {
+    filter: brightness(50%); 
+}
+
+.artwork-card:hover .overlay {
+    opacity: 1; 
+}
+
+.student-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.stars {
+    font-size: 1.1rem;
+    color: #ffcc00;
+}
+
+main {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+Няма намерени творби
+p {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #666;
+    width: 100%;
+}

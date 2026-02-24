@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1770747756479,
+    "studentName": "gosho",
+    "imageUrl": "images/test.png",
+    "category": "Плакати",
+    "grade": 8,
+    "voters": [
+      "emoaltanov@gmail.com"
+    ],
+    "averageRating": 3
+  }
+]
