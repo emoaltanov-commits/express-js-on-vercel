@@ -1,10 +1,10 @@
 const express = require('express');
 const serverless = require('serverless-http');
-const connectDB = require('./api/db');
+const connectDB = require('./db');
 
-const authRoutes = require('./api/routes/auth');
-const artworksRoutes = require('./api/routes/artworks');
-const voteRoutes = require('./api/routes/vote');
+const authRoutes = require('./routes/auth');
+const artworksRoutes = require('./routes/artworks');
+const voteRoutes = require('./routes/vote');
 
 const app = express();
 
