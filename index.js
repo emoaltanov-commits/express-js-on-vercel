@@ -142,3 +142,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(` Сървърът е готов на http://localhost:${port}`);
 });
+
+module.exports = app;
