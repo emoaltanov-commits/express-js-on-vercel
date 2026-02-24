@@ -3,7 +3,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const app = express();
-const port = 3000;
+const serverless = require('serverless-http');
 // --- ВРЪЗКА КЪМ MONGODB ---
 
 mongoose.connect("mongodb://user2:mGWCK5HOskhp9MLb@ac-sjwfetq-shard-00-00.lt12gti.mongodb.net:27017,ac-sjwfetq-shard-00-01.lt12gti.mongodb.net:27017,ac-sjwfetq-shard-00-02.lt12gti.mongodb.net:27017/?replicaSet=atlas-vdhsck-shard-0&ssl=true&authSource=admin")
@@ -141,6 +141,5 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-
-
 module.exports = app;
+module.exports.handler = serverless(app);
