@@ -139,8 +139,4 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(port, () => {
-    console.log(` Сървърът е готов на http://localhost:${port}`);
-});
-
 module.exports = app;
