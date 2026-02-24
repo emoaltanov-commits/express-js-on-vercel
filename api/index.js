@@ -21,8 +21,6 @@ app.use('/api/artworks', artworksRoutes);
 app.use('/api/vote', voteRoutes);
 
 // Optional: serve static files (frontend)
-app.use(express.static('public'));
-app.get('/', (req, res) => res.sendFile('index.html', { root: 'public' }));
 
 module.exports = app;
 module.exports.handler = serverless(app);
