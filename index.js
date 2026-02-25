@@ -6,7 +6,7 @@ const app = express();
 const serverless = require('serverless-http');
 // --- ВРЪЗКА КЪМ MONGODB ---
 
-mongoose.connect("mongodb://user2:mGWCK5HOskhp9MLb@ac-sjwfetq-shard-00-00.lt12gti.mongodb.net:27017,ac-sjwfetq-shard-00-01.lt12gti.mongodb.net:27017,ac-sjwfetq-shard-00-02.lt12gti.mongodb.net:27017/?replicaSet=atlas-vdhsck-shard-0&ssl=true&authSource=admin")
+mongoose.connect("mongodb+srv://user2:mGWCK5HOskhp9MLb@ac-sjwfetq-shard-00-00.lt12gti.mongodb.net:27017,ac-sjwfetq-shard-00-01.lt12gti.mongodb.net:27017,ac-sjwfetq-shard-00-02.lt12gti.mongodb.net:27017/?replicaSet=atlas-vdhsck-shard-0&ssl=true&authSource=admin")
     .then(() => console.log("MongoDB connected"))
     .catch(err => console.log("MongoDB error:", err));
 // --- USER MODEL --
