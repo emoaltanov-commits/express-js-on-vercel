@@ -2,15 +2,17 @@ const mongoose = require('mongoose');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
+const { GridFSBucket } = require('mongodb');
 const app = express();
 const serverless = require('serverless-http');
-// --- ВРЪЗКА КЪМ MONGODB ---
 
+// --- ВРЪЗКА КЪМ MONGODB ---
 mongoose.connect("mongodb+srv://user2:mGWCK5HOskhp9MLb@lt12gti.mongodb.net/?retryWrites=true&w=majority")
     .then(() => console.log("MongoDB connected"))
     .catch(err => console.log("MongoDB error:", err));
-// --- USER MODEL --
 
+// --- USER MODEL ---
 const userSchema = new mongoose.Schema({
     username: String,
     email: { type: String, unique: true },
@@ -18,31 +20,39 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', userSchema);
-    // Настройки на сървъра
+
+// --- ARTWORK MODEL ---
+const artworkSchema = new mongoose.Schema({
+    studentName: String,
+    category: String,
+    grade: Number,
+    voters: [String],  // List of emails who voted
+    averageRating: { type: Number, default: 0 },
+    imageId: mongoose.Schema.Types.ObjectId  // MongoDB reference to the image
+});
+
+const Artwork = mongoose.model('Artwork', artworkSchema);
+
+// --- MONGO GRIDFS SETUP ---
+const conn = mongoose.connection;
+let gfs;
+
+conn.once('open', () => {
+    gfs = new GridFSBucket(conn.db, {
+        bucketName: 'artworks'
+    });
+});
+
+// --- MULTER SETUP FOR IMAGE UPLOADS ---
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+// Настройки на сървъра
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const DATA_FILE = path.join(__dirname, 'artworks.json');
-
-// --- ПОМОЩНИ ФУНКЦИИ ---
-
-const getData = () => {
-    if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, JSON.stringify([]));
-    return JSON.parse(fs.readFileSync(DATA_FILE));
-};
-
-const saveData = (data) => {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-};
-
-const getUsers = () => {
-    if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, JSON.stringify([]));
-    return JSON.parse(fs.readFileSync(USERS_FILE));
-};
-
 // --- МАРШРУТИ ЗА ПОТРЕБИТЕЛИ ---
-
 app.post('/api/register', async (req, res) => {
     const { username, email, password } = req.body;
 
@@ -62,27 +72,60 @@ app.post('/api/register', async (req, res) => {
         res.status(500).json({ message: "Грешка при регистрация" });
     }
 });
+
 // --- МАРШРУТИ ЗА ГАЛЕРИЯТА ---
 
-app.get('/api/artworks', (req, res) => {
-    res.json(getData());
+// Get all artworks
+app.get('/api/artworks', async (req, res) => {
+    try {
+        const artworks = await Artwork.find().populate('imageId');
+        res.json(artworks);
+    } catch (err) {
+        res.status(500).json({ message: "Грешка при зареждане на картините!" });
+    }
 });
 
-app.post('/api/artworks', (req, res) => {
-    const artworks = getData();
-    const newArtwork = {
-        id: Date.now(), // Уникално ID
-        studentName: req.body.studentName,
-        imageUrl: req.body.imageUrl,
-        category: req.body.category,
-        grade: parseInt(req.body.grade),
-        voters: [], // Списък с имейли на гласувалите
-        averageRating: 0
-    };
-    artworks.push(newArtwork);
-    saveData(artworks);
-    res.status(201).send("Картината е добавена успешно!");
+// Add a new artwork
+app.post('/api/artworks', upload.single('image'), async (req, res) => {
+    const { studentName, category, grade } = req.body;
+
+    try {
+        // Store image in GridFS
+        const uploadStream = gfs.openUploadStream(req.file.originalname, {
+            content_type: req.file.mimetype
+        });
+
+        uploadStream.end(req.file.buffer);
+
+        // Create new artwork document
+        const newArtwork = new Artwork({
+            studentName,
+            category,
+            grade: parseInt(grade),
+            voters: [],
+            averageRating: 0,
+            imageId: uploadStream.id  // Store the image ID for future reference
+        });
+
+        await newArtwork.save();
+        res.status(201).send("Картината е добавена успешно!");
+    } catch (error) {
+        res.status(500).json({ message: "Грешка при добавяне на картината!" });
+    }
 });
+
+// --- МАРШРУТ ЗА ИЗТЕГЛЯНЕ НА ИЗОБРАЖЕНИЕ ---
+app.get('/api/artworks/:id/image', (req, res) => {
+    const fileId = mongoose.Types.ObjectId(req.params.id);
+
+    gfs.openDownloadStream(fileId)
+        .pipe(res)
+        .on('error', (err) => {
+            res.status(500).json({ message: "Грешка при изтегляне на изображение!" });
+        });
+});
+
+// --- МАРШРУТ ЗА ВХОД ---
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -99,39 +142,35 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ message: "Грешка при вход" });
     }
 });
-// ГЛАВНИЯТ МАРШРУТ ЗА ГЛАСУВАНЕ (ПОПРАВЕН)
-app.post('/api/vote', (req, res) => {
+
+// --- ГЛАВНИЯТ МАРШРУТ ЗА ГЛАСУВАНЕ ---
+app.post('/api/vote', async (req, res) => {
     const { id, rating, email } = req.body;
-    const artworks = getData();
-    
-    // Търсим по ID (внимаваме за типа данни)
-    const artIndex = artworks.findIndex(a => a.id == id);
 
-    if (artIndex !== -1) {
-        const art = artworks[artIndex];
+    try {
+        const artwork = await Artwork.findById(id);
 
-        if (!art.voters) art.voters = [];
+        if (!artwork) {
+            return res.status(404).json({ message: "Творбата не е намерена" });
+        }
 
-        // Проверка дали този имейл вече е гласувал
-        if (art.voters.includes(email)) {
+        if (artwork.voters.includes(email)) {
             return res.status(400).json({ message: "Вече сте гласували за тази картина!" });
         }
 
-        // Добавяме гласа
-        art.voters.push(email);
-        
-        // Изчисляване на новия среден рейтинг
+        artwork.voters.push(email);
+        const totalVotes = artwork.voters.length;
+        const currentAvg = artwork.averageRating || 0;
         const voteValue = parseInt(rating);
-        const totalVotes = art.voters.length;
-        
-        // Математика: (старо средно * стари гласове + нов глас) / нови гласове
-        const currentAvg = art.averageRating || 0;
-        art.averageRating = parseFloat(((currentAvg * (totalVotes - 1) + voteValue) / totalVotes).toFixed(1));
 
-        saveData(artworks);
-        res.json({ success: true, averageRating: art.averageRating });
-    } else {
-        res.status(404).json({ message: "Творбата не е намерена" });
+        // Calculate new average rating
+        artwork.averageRating = ((currentAvg * (totalVotes - 1) + voteValue) / totalVotes).toFixed(1);
+
+        await artwork.save();
+        res.json({ success: true, averageRating: artwork.averageRating });
+
+    } catch (error) {
+        res.status(500).json({ message: "Грешка при гласуването!" });
     }
 });
 
