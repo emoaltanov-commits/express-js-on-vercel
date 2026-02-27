@@ -67,9 +67,21 @@ app.post('/api/register', async (req, res) => {
 
 app.get('/api/artworks', async (req, res) => {
     try {
+        // Fetch all artworks from the database
         const artworks = await Artwork.find();
-        res.json(artworks);
+
+        // Return artworks with the image URL adjusted
+        const artworksWithImagePath = artworks.map(artwork => {
+            return {
+                ...artwork.toObject(),  // Convert Mongoose document to plain JavaScript object
+                imageUrl: `/public/${artwork.imageUrl}`  // Adjust the image URL to point to the 'public' folder
+            };
+        });
+
+        // Respond with the artworks including image URLs
+        res.json(artworksWithImagePath);
     } catch (err) {
+        console.error("Error fetching artworks:", err);
         res.status(500).json({ message: "Грешка при зареждане на картините!" });
     }
 });
