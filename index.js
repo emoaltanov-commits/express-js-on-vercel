@@ -8,14 +8,14 @@ mongoose.connect("mongodb+srv://user2:mGWCK5HOskhp9MLb@lt12gti.mongodb.net/?retr
     .then(() => console.log("MongoDB connected"))
     .catch(err => console.log("MongoDB error:", err));
 
-
+// --- USER MODEL ---
 const userSchema = new mongoose.Schema({
     username: String,
     email: { type: String, unique: true },
     password: String
 });
 
-
+// Ensure that the model is not redefined
 let User;
 try {
     User = mongoose.model('User'); // This will return the existing model if already defined
@@ -23,7 +23,7 @@ try {
     User = mongoose.model('User', userSchema); // Otherwise, create the model
 }
 
-
+// --- ARTWORK MODEL (WITH VOTING) ---
 const artworkSchema = new mongoose.Schema({
     studentName: String,
     category: String,
@@ -32,7 +32,13 @@ const artworkSchema = new mongoose.Schema({
     averageRating: { type: Number, default: 0 }
 });
 
-const Artwork = mongoose.model('Artwork', artworkSchema);
+// Ensure that the model is not redefined
+let Artwork;
+try {
+    Artwork = mongoose.model('Artwork'); // This will return the existing model if already defined
+} catch (error) {
+    Artwork = mongoose.model('Artwork', artworkSchema); // Otherwise, create the model
+}
 
 // Настройки на сървъра
 app.use(express.static('public'));
@@ -72,6 +78,7 @@ app.get('/api/artworks', async (req, res) => {
     }
 });
 
+// Add a new artwork
 app.post('/api/artworks', async (req, res) => {
     const { studentName, category, grade } = req.body;
 
