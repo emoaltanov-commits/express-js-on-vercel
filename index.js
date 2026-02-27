@@ -73,7 +73,7 @@ app.get('/api/artworks', async (req, res) => {
         // Return artworks with the image URL adjusted
         const artworksWithImagePath = artworks.map(artwork => {
             return {
-                artwork.toObject(),  // Convert Mongoose document to plain JavaScript object
+                ...artwork.toObject(),  // Convert Mongoose document to plain JavaScript object
                 imageUrl: `${artwork.imageUrl}`  // Adjust the image URL to point to the 'public' folder
             };
         });
