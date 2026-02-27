@@ -22,7 +22,6 @@ try {
     User = mongoose.model('User', userSchema); // Otherwise, create the model
 }
 
-// --- ARTWORK MODEL (WITH VOTING) ---
 const artworkSchema = new mongoose.Schema({
     studentName: String,
     category: String,
