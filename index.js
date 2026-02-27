@@ -23,6 +23,7 @@ try {
 }
 
 const artworkSchema = new mongoose.Schema({
+    imageId: String,
     studentName: String,
     category: String,
     grade: Number,
