@@ -75,20 +75,32 @@ app.get('/api/artworks', async (req, res) => {
 });
 
 app.post('/api/artworks', async (req, res) => {
-    const { studentName, category, grade } = req.body;
+    const { studentName, imageUrl, category, grade } = req.body;
+
+    // Validate all required fields
+    if (!studentName || !imageUrl || !category || !grade) {
+        return res.status(400).json({ message: "Всички полета са задължителни!" });
+    }
 
     try {
+        // Create a new artwork document with all fields, including the imageUrl
         const newArtwork = new Artwork({
             studentName,
+            imageUrl,       // Save the image URL
             category,
             grade: parseInt(grade),
             voters: [],
-            averageRating: 0
+            averageRating: 0 // Default start rating
         });
 
+        // Save the new artwork to the database
         await newArtwork.save();
-        res.status(201).send("Картината е добавена успешно!");
+
+        // Respond with a success message
+        res.status(201).json({ message: "Творбата е добавена успешно!" });
+
     } catch (error) {
+        console.error("Error adding artwork:", error);
         res.status(500).json({ message: "Грешка при добавяне на картината!" });
     }
 });
