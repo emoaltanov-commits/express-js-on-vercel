@@ -8,13 +8,21 @@ mongoose.connect("mongodb+srv://user2:mGWCK5HOskhp9MLb@lt12gti.mongodb.net/?retr
     .then(() => console.log("MongoDB connected"))
     .catch(err => console.log("MongoDB error:", err));
 
+
 const userSchema = new mongoose.Schema({
     username: String,
     email: { type: String, unique: true },
     password: String
 });
 
-const User = mongoose.model('User', userSchema);
+
+let User;
+try {
+    User = mongoose.model('User'); // This will return the existing model if already defined
+} catch (error) {
+    User = mongoose.model('User', userSchema); // Otherwise, create the model
+}
+
 
 const artworkSchema = new mongoose.Schema({
     studentName: String,
@@ -64,7 +72,6 @@ app.get('/api/artworks', async (req, res) => {
     }
 });
 
-// Add a new artwork
 app.post('/api/artworks', async (req, res) => {
     const { studentName, category, grade } = req.body;
 
@@ -103,7 +110,6 @@ app.post('/api/login', async (req, res) => {
 });
 
 // --- ГЛАВНИЯТ МАРШРУТ ЗА ГЛАСУВАНЕ ---
-
 app.post('/api/vote', async (req, res) => {
     const { id, rating, email } = req.body;
 
