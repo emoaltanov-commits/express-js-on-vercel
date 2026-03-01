@@ -23,11 +23,11 @@ try {
 }
 
 const artworkSchema = new mongoose.Schema({
-    imageId: String,
+    imageUrl: String,    // Беше imageId, направи го на imageUrl
     studentName: String,
     category: String,
     grade: Number,
-    voters: [String],  // List of emails who voted
+    voters: [String],
     averageRating: { type: Number, default: 0 }
 });
 
