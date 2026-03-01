@@ -67,20 +67,24 @@
         }
 
         // 3. СЪЗДАВАНЕ НА КАРТА
-        function createCard(art) {
-            return `
-                <div class="artwork-card">
-                    <img src="${artworks.json}" alt="Картина">
-                    <div class="overlay">
-                        <div class="student-name">${art.studentName}</div>
-                        <div class="stars" onclick="vote(${art.id})" style="cursor:pointer">
-                            ⭐ <span id="rating-${art.id}">${art.averageRating || 0}</span>
-                        </div>
-                        <div style="font-size: 0.8rem; margin-top:10px;">${art.category}, ${art.grade} клас</div>
-                    </div>
+       
+function createCard(art) {
+    // Ако imageUrl липсва или е празен, не показваме img тага
+    const imgHtml = art.imageUrl ? `<img src="${art.imageUrl}" alt="Творба на ${art.studentName}">` : '';
+
+    return `
+        <div class="artwork-card">
+            ${imgHtml}
+            <div class="overlay">
+                <div class="student-name">${art.studentName}</div>
+                <div class="stars" onclick="vote('${art._id}')" style="cursor:pointer">
+                    ⭐ <span id="rating-${art._id}">${art.averageRating || 0}</span>
                 </div>
-            `;
-        }
+                <div style="font-size: 0.8rem; margin-top:10px;">${art.category}, ${art.grade} клас</div>
+            </div>
+        </div>
+    `;
+}
 
         // 4. ГЛАСУВАНЕ
         function vote(id) {
