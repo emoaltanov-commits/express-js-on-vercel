@@ -1,4 +1,14 @@
 [
-  
+  {
+    "id": 1770747756479,
+    "studentName": "gosh",
+    "imageUrl": "images/test.png",
+    "category": "Плакати",
+    "grade": 8,
+    "voters": [
+      
+    ],
+    "averageRating": 0
+  }
    
 ]
