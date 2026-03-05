@@ -70,12 +70,7 @@ app.post('/api/register', async (req, res) => {
     try {
         await connectDB(); // 🔥 ВАЖНО
 
-        const artworks = await Artwork.find();
-        res.json(artworks);
-
     } catch (err) {
-        console.error("Error fetching artworks:", err);
-        res.status(500).json({ message: "Грешка при зареждане на картините!" });
     }
 
     try {
@@ -101,12 +96,7 @@ app.get('/api/artworks', async (req, res) => {
     try {
         await connectDB(); // 🔥 ВАЖНО
 
-        const artworks = await Artwork.find();
-        res.json(artworks);
-
     } catch (err) {
-        console.error("Error fetching artworks:", err);
-        res.status(500).json({ message: "Грешка при зареждане на картините!" });
     }
     try {
         // Fetch all artworks from the database
@@ -131,12 +121,7 @@ app.post('/api/artworks', async (req, res) => {
     try {
         await connectDB(); // 🔥 ВАЖНО
 
-        const artworks = await Artwork.find();
-        res.json(artworks);
-
     } catch (err) {
-        console.error("Error fetching artworks:", err);
-        res.status(500).json({ message: "Грешка при зареждане на картините!" });
     }
     const { studentName, imageUrl, category, grade } = req.body;
 
@@ -173,12 +158,7 @@ app.post('/api/login', async (req, res) => {
     try {
         await connectDB(); // 🔥 ВАЖНО
 
-        const artworks = await Artwork.find();
-        res.json(artworks);
-
     } catch (err) {
-        console.error("Error fetching artworks:", err);
-        res.status(500).json({ message: "Грешка при зареждане на картините!" });
     }
     const { email, password } = req.body;
 
@@ -201,12 +181,7 @@ app.post('/api/vote', async (req, res) => {
     try {
         await connectDB(); // 🔥 ВАЖНО
 
-        const artworks = await Artwork.find();
-        res.json(artworks);
-
     } catch (err) {
-        console.error("Error fetching artworks:", err);
-        res.status(500).json({ message: "Грешка при зареждане на картините!" });
     }
     const { id, rating, email } = req.body;
 
