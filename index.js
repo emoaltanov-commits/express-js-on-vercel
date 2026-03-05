@@ -4,6 +4,7 @@ const path = require('path');
 const app = express();
 const serverless = require('serverless-http');
 
+
 // --- ВРЪЗКА КЪМ MONGODB ---
 mongoose.connect("mongodb+srv://user2:mGWCK5HOskhp9MLb@lt12gti.mongodb.net/?retryWrites=true&w=majority")
     .then(() => console.log("MongoDB connected"))
