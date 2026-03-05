@@ -5,10 +5,27 @@ const app = express();
 const serverless = require('serverless-http');
 
 
-// --- ВРЪЗКА КЪМ MONGODB ---
-mongoose.connect("mongodb+srv://user2:mGWCK5HOskhp9MLb@lt12gti.mongodb.net/?retryWrites=true&w=majority")
-    .then(() => console.log("MongoDB connected"))
-    .catch(err => console.log("MongoDB error:", err));
+let cached = global.mongoose;
+
+if (!cached) {
+    cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+    if (cached.conn) return cached.conn;
+
+    if (!cached.promise) {
+        cached.promise = mongoose.connect(MONGODB_URI, {
+            bufferCommands: false,
+        }).then(mongoose => {
+            console.log("MongoDB connected");
+            return mongoose;
+        });
+    }
+
+    cached.conn = await cached.promise;
+    return cached.conn;
+}
 
 const userSchema = new mongoose.Schema({
     username: String,
@@ -49,6 +66,17 @@ app.post('/api/register', async (req, res) => {
     const { username, email, password } = req.body;
 
     try {
+        await connectDB(); // 🔥 ВАЖНО
+
+        const artworks = await Artwork.find();
+        res.json(artworks);
+
+    } catch (err) {
+        console.error("Error fetching artworks:", err);
+        res.status(500).json({ message: "Грешка при зареждане на картините!" });
+    }
+
+    try {
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
@@ -69,6 +97,16 @@ app.post('/api/register', async (req, res) => {
 
 app.get('/api/artworks', async (req, res) => {
     try {
+        await connectDB(); // 🔥 ВАЖНО
+
+        const artworks = await Artwork.find();
+        res.json(artworks);
+
+    } catch (err) {
+        console.error("Error fetching artworks:", err);
+        res.status(500).json({ message: "Грешка при зареждане на картините!" });
+    }
+    try {
         // Fetch all artworks from the database
         const artworks = await Artwork.find();
 
@@ -88,6 +126,16 @@ app.get('/api/artworks', async (req, res) => {
 });
 
 app.post('/api/artworks', async (req, res) => {
+    try {
+        await connectDB(); // 🔥 ВАЖНО
+
+        const artworks = await Artwork.find();
+        res.json(artworks);
+
+    } catch (err) {
+        console.error("Error fetching artworks:", err);
+        res.status(500).json({ message: "Грешка при зареждане на картините!" });
+    }
     const { studentName, imageUrl, category, grade } = req.body;
 
     // Validate all required fields
@@ -120,6 +168,16 @@ app.post('/api/artworks', async (req, res) => {
 
 // --- МАРШРУТ ЗА ВХОД ---
 app.post('/api/login', async (req, res) => {
+    try {
+        await connectDB(); // 🔥 ВАЖНО
+
+        const artworks = await Artwork.find();
+        res.json(artworks);
+
+    } catch (err) {
+        console.error("Error fetching artworks:", err);
+        res.status(500).json({ message: "Грешка при зареждане на картините!" });
+    }
     const { email, password } = req.body;
 
     try {
@@ -138,6 +196,16 @@ app.post('/api/login', async (req, res) => {
 
 // --- ГЛАВНИЯТ МАРШРУТ ЗА ГЛАСУВАНЕ ---
 app.post('/api/vote', async (req, res) => {
+    try {
+        await connectDB(); // 🔥 ВАЖНО
+
+        const artworks = await Artwork.find();
+        res.json(artworks);
+
+    } catch (err) {
+        console.error("Error fetching artworks:", err);
+        res.status(500).json({ message: "Грешка при зареждане на картините!" });
+    }
     const { id, rating, email } = req.body;
 
     try {
