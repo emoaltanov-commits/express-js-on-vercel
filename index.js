@@ -4,6 +4,8 @@ const path = require('path');
 const app = express();
 const serverless = require('serverless-http');
 
+const MONGODB_URI = "mongodb+srv://user2:mGWCK5HOskhp9MLb@lt12gti.mongodb.net/?retryWrites=true&w=majority";
+
 
 let cached = global.mongoose;
 
